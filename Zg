@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Zubeen Garg - Single Track Radio</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent-color: #ef4444;
+      --accent-hover: #dc2626;
+      --text-color: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .player-card {
+      background-color: var(--card-bg);
+      border-radius: 20px;
+      padding: 24px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+
+    .header {
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      border-radius: 12px;
+      background-color: #000;
+      margin-bottom: 20px;
+    }
+
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .btn-shuffle {
+      background-color: var(--accent-color);
+      color: #ffffff;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s ease;
+    }
+
+    .btn-shuffle:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .info-bar {
+      margin-top: 14px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="player-card">
+    <div class="header">
+      <h1>Zubeen Garg</h1>
+      <p>Single Song Radio (2000+ Track Catalog)</p>
+    </div>
+
+    <div class="video-container">
+      <iframe 
+        id="player"
+        src="https://www.youtube-nocookie.com/embed/3m0V1u4O72I?autoplay=1" 
+        title="Zubeen Garg Track Player"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <button class="btn-shuffle" id="shuffleBtn">🔀 Play Random Single Song</button>
+    <div class="info-bar" id="infoText">Ready to stream single tracks</div>
+  </div>
+
+  <script>
+    const API_KEY = "YOUR_YOUTUBE_API_KEY"; // Insert your API key here
+    
+    // Sub-genres and album queries across his 30+ year discography
+    const searchQueries = [
+      "Zubeen Garg Anamika single song",
+      "Zubeen Garg Mayabini single track",
+      "Zubeen Garg Mukha album audio",
+      "Zubeen Garg Pakhi album audio",
+      "Zubeen Garg Rumal album track",
+      "Zubeen Garg Maya album audio",
+      "Zubeen Garg Bihu audio single",
+      "Zubeen Garg romantic Assamese single",
+      "Zubeen Garg Hindi movie song audio",
+      "Zubeen Garg Bengali film single track",
+      "Zubeen Garg Sishu audio track",
+      "Zubeen Garg Jantra audio song",
+      "Zubeen Garg Rong audio song",
+      "Zubeen Garg Mon Jai title track"
+    ];
+
+    const iframe = document.getElementById('player');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    const infoText = document.getElementById('infoText');
+
+    async function fetchRandomSingleTrack() {
+      infoText.textContent = "Searching catalog...";
+      
+      const query = searchQueries[Math.floor(Math.random() * searchQueries.length)];
+      const randomPageTokenOffset = Math.floor(Math.random() * 5); // Search across multiple result pages
+
+      const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=25&q=${encodeURIComponent(query)}&type=video&videoEmbeddable=true&key=${API_KEY}`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.items && data.items.length > 0) {
+          // Select a random video from the retrieved results
+          const randomVideo = data.items[Math.floor(Math.random() * data.items.length)];
+          const videoId = randomVideo.id.videoId;
+          const videoTitle = randomVideo.snippet.title;
+
+          iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`;
+          infoText.textContent = `Playing: ${videoTitle}`;
+        } else {
+          infoText.textContent = "No embeddable track found, retrying...";
+        }
+      } catch (err) {
+        console.error("API Fetch Error:", err);
+        infoText.textContent = "Add your YouTube API Key in the code script to load dynamic tracks.";
+      }
+    }
+
+    shuffleBtn.addEventListener('click', fetchRandomSingleTrack);
+  </script>
+
+</body>
+</html>
